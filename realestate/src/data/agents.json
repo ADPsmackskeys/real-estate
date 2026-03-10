@@ -1,0 +1,47 @@
+[
+  {
+    "id": "a1",
+    "name": "Priya Sharma",
+    "photo": "",
+    "title": "Senior Property Consultant",
+    "agency": "Prime Realty Group",
+    "phone": "+91 98200 11234",
+    "email": "priya.sharma@primerealty.in",
+    "whatsapp": "+919820011234",
+    "locations": ["Mumbai", "Pune"],
+    "specializations": ["Luxury Residential", "Penthouses"],
+    "listings": 24,
+    "experience": 9,
+    "rating": 4.9
+  },
+  {
+    "id": "a2",
+    "name": "Rahul Mehta",
+    "photo": "",
+    "title": "Commercial & Retail Specialist",
+    "agency": "Metro Properties",
+    "phone": "+91 99001 56789",
+    "email": "rahul.mehta@metroprop.in",
+    "whatsapp": "+919900156789",
+    "locations": ["Bangalore", "Hyderabad"],
+    "specializations": ["Commercial", "Retail", "Co-working"],
+    "listings": 18,
+    "experience": 6,
+    "rating": 4.7
+  },
+  {
+    "id": "a3",
+    "name": "Ananya Iyer",
+    "photo": "",
+    "title": "Residential Sales Expert",
+    "agency": "HomeFirst Advisory",
+    "phone": "+91 96500 78901",
+    "email": "ananya.iyer@homefirst.in",
+    "whatsapp": "+919650078901",
+    "locations": ["Pune", "Mumbai"],
+    "specializations": ["Apartments", "Villas", "New Launches"],
+    "listings": 31,
+    "experience": 11,
+    "rating": 4.8
+  }
+]
