@@ -16,54 +16,84 @@ namespace Backend.Controllers
             _context = context;
         }
 
-        // GET /api/properties?minPrice=100000&maxPrice=500000&location=Austin&type=House&sortBy=price
+        // GET /api/properties?minPrice=100000&maxPrice=500000&city=Mumbai&locality=Bandra&type=Apartment&status=Available&sortBy=price
         [HttpGet]
         public async Task<IActionResult> GetAll(
             [FromQuery] decimal? minPrice,
             [FromQuery] decimal? maxPrice,
-            [FromQuery] string? location,
-            [FromQuery] string? type,
-            [FromQuery] string? sortBy)
+            [FromQuery] string?  city,
+            [FromQuery] string?  locality,
+            [FromQuery] string?  type,
+            [FromQuery] string?  status,
+            [FromQuery] int?     minBedrooms,
+            [FromQuery] double?  minArea,
+            [FromQuery] double?  maxArea,
+            [FromQuery] string?  sortBy)
         {
             var query = _context.Properties
                 .Include(p => p.Agent)
                 .AsQueryable();
 
+            // --- Filtering ---
             if (minPrice.HasValue)
                 query = query.Where(p => p.Price >= minPrice.Value);
 
             if (maxPrice.HasValue)
                 query = query.Where(p => p.Price <= maxPrice.Value);
 
-            if (!string.IsNullOrWhiteSpace(location))
-                query = query.Where(p => p.Location.Contains(location));
+            if (!string.IsNullOrWhiteSpace(city))
+                query = query.Where(p => p.City.Contains(city));
+
+            if (!string.IsNullOrWhiteSpace(locality))
+                query = query.Where(p => p.Locality.Contains(locality));
 
             if (!string.IsNullOrWhiteSpace(type))
                 query = query.Where(p => p.Type.ToLower() == type.ToLower());
 
+            if (!string.IsNullOrWhiteSpace(status))
+                query = query.Where(p => p.Status.ToLower() == status.ToLower());
+
+            if (minBedrooms.HasValue)
+                query = query.Where(p => p.Bedrooms >= minBedrooms.Value);
+
+            if (minArea.HasValue)
+                query = query.Where(p => p.AreaSqFt >= minArea.Value);
+
+            if (maxArea.HasValue)
+                query = query.Where(p => p.AreaSqFt <= maxArea.Value);
+
             // --- Sorting ---
             query = sortBy?.ToLower() switch
             {
-                "price"     => query.OrderBy(p => p.Price),
-                "price_desc"=> query.OrderByDescending(p => p.Price),
-                "newest"    => query.OrderByDescending(p => p.ListedAt),
-                _           => query.OrderBy(p => p.Id)
+                "price"      => query.OrderBy(p => p.Price),
+                "price_desc" => query.OrderByDescending(p => p.Price),
+                "newest"     => query.OrderByDescending(p => p.ListedAt),
+                "area"       => query.OrderBy(p => p.AreaSqFt),
+                "popular"    => query.OrderByDescending(p => p.ViewCount),
+                _            => query.OrderByDescending(p => p.ListedAt) // default: newest first
             };
 
+            // --- Projection ---
             var results = await query.Select(p => new
             {
                 p.Id,
                 p.Title,
-                p.Price,
-                p.Location,
                 p.Type,
+                p.Status,
+                p.Price,
                 p.Bedrooms,
                 p.Bathrooms,
-                p.SquareFeet,
-                p.IsAvailable,
+                p.AreaSqFt,
+                p.Address,
+                p.City,
+                p.Locality,
+                p.Latitude,
+                p.Longitude,
+                p.AmenitiesJson,
+                p.ViewCount,
                 p.ListedAt,
-                Agent = new { p.Agent!.Name, p.Agent.Email, p.Agent.Phone }
-            }).ToListAsync();  
+                Agent = new { p.Agent!.Name, p.Agent.Email, p.Agent.Phone, p.Agent.Agency }
+            }).ToListAsync();
 
             return Ok(results);
         }
@@ -78,6 +108,10 @@ namespace Backend.Controllers
 
             if (property is null)
                 return NotFound();
+
+            // Increment view count
+            property.ViewCount++;
+            await _context.SaveChangesAsync();
 
             return Ok(property);
         }
@@ -98,15 +132,20 @@ namespace Backend.Controllers
             var property = await _context.Properties.FindAsync(id);
             if (property is null) return NotFound();
 
-            property.Title       = updated.Title;
-            property.Description = updated.Description;
-            property.Price       = updated.Price;
-            property.Location    = updated.Location;
-            property.Type        = updated.Type;
-            property.Bedrooms    = updated.Bedrooms;
-            property.Bathrooms   = updated.Bathrooms;
-            property.SquareFeet  = updated.SquareFeet;
-            property.IsAvailable = updated.IsAvailable;
+            property.Title         = updated.Title;
+            property.Description   = updated.Description;
+            property.Type          = updated.Type;
+            property.Status        = updated.Status;
+            property.Price         = updated.Price;
+            property.Bedrooms      = updated.Bedrooms;
+            property.Bathrooms     = updated.Bathrooms;
+            property.AreaSqFt      = updated.AreaSqFt;
+            property.Address       = updated.Address;
+            property.City          = updated.City;
+            property.Locality      = updated.Locality;
+            property.Latitude      = updated.Latitude;
+            property.Longitude     = updated.Longitude;
+            property.AmenitiesJson = updated.AmenitiesJson;
 
             await _context.SaveChangesAsync();
             return NoContent();
