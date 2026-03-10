@@ -1,13 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import LocationSelector from "../components/LocationSelector";
-import PropertyTypeSelector from "../components/PropertyTypeSelector";
 import Filters from "../components/Filters";
 import SearchBar from "../components/SearchBar";
 import PropertyCard from "../components/PropertyCard";
-import { search, filterProperties } from "../services/searchService";
-import propertiesData from "../data/properties.json";
-import agentsData from "../data/agents.json";
+import { search } from "../services/searchService";
+import { propertiesApi } from "../api";
 
 const DEFAULT_FILTERS = {
   status: "all",
@@ -18,40 +16,45 @@ const DEFAULT_FILTERS = {
 export default function Home({ favourites, onToggleFav, isFav }) {
   const navigate = useNavigate();
   const [location, setLocation] = useState("all");
-  const [type, setType] = useState("all");
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [query, setQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
-  const [results, setResults] = useState(propertiesData);
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
-
-  const agentMap = Object.fromEntries(agentsData.map((a) => [a.id, a]));
 
   const runSearch = useCallback(async (q) => {
     setLoading(true);
-    const preFiltered = filterProperties(propertiesData, {
-      location,
-      type,
-      ...filters,
-    });
-    const searched = await search(preFiltered, q, { useAI: false });
-    setResults(searched);
-    setLoading(false);
-  }, [location, type, filters]);
+    setError(null);
+    try {
+      const apiFilters = {
+        ...(location !== "all"       && { city: location }),
+        ...(filters.status !== "all" && { status: filters.status }),
+        ...(filters.minBeds > 0      && { minBedrooms: filters.minBeds }),
+        ...(filters.minPrice         && { minPrice: filters.minPrice }),
+        ...(filters.maxPrice         && { maxPrice: filters.maxPrice }),
+      };
 
-  // Re-run whenever location/type/filters change
+      const data = await propertiesApi.getAll(apiFilters);
+      const searched = q.trim() ? await search(data, q, { useAI: false }) : data;
+      setResults(searched);
+    } catch (err) {
+      setError("Could not load properties. Is the backend running?");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [location, filters]);
+
   useEffect(() => {
     runSearch(activeQuery);
-  }, [location, type, filters, activeQuery, runSearch]);
+  }, [location, filters, activeQuery, runSearch]);
 
-  const handleSearch = (q) => {
-    setActiveQuery(q);
-  };
+  const handleSearch = (q) => setActiveQuery(q);
 
   return (
     <main className="home-page">
-      {/* Hero search panel */}
       <section className="search-section">
         <div className="search-section-inner">
           <h1 className="hero-title">
@@ -62,7 +65,6 @@ export default function Home({ favourites, onToggleFav, isFav }) {
           <div className="search-controls">
             <div className="selectors-row">
               <LocationSelector value={location} onChange={setLocation} />
-              <PropertyTypeSelector value={type} onChange={setType} />
             </div>
 
             <SearchBar
@@ -90,21 +92,30 @@ export default function Home({ favourites, onToggleFav, isFav }) {
             </div>
 
             {showFilters && (
-              <Filters filters={filters} onChange={setFilters} propertyType={type} />
+              <Filters filters={filters} onChange={setFilters} />
             )}
           </div>
         </div>
       </section>
 
-      {/* Results */}
       <section className="results-section">
         <div className="results-header">
           <span className="results-count">
-            {loading ? "Searching…" : `${results.length} propert${results.length !== 1 ? "ies" : "y"} found`}
+            {loading
+              ? "Searching…"
+              : `${results.length} propert${results.length !== 1 ? "ies" : "y"} found`}
           </span>
         </div>
 
-        {results.length === 0 && !loading ? (
+        {error && (
+          <div className="empty-state">
+            <div className="empty-icon">⚠️</div>
+            <h3>Something went wrong</h3>
+            <p>{error}</p>
+          </div>
+        )}
+
+        {!error && results.length === 0 && !loading ? (
           <div className="empty-state">
             <div className="empty-icon">🔍</div>
             <h3>No properties found</h3>
@@ -119,7 +130,7 @@ export default function Home({ favourites, onToggleFav, isFav }) {
                 isFavourite={isFav(p.id)}
                 onToggleFavourite={onToggleFav}
                 onViewDetails={(prop) => navigate(`/property/${prop.id}`)}
-                agent={agentMap[p.agentId]}
+                agent={p.agent}
               />
             ))}
           </div>

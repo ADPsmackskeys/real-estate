@@ -37,40 +37,38 @@ namespace Backend.Controllers
         }
 
         // GET /api/agents/{id}
-        // Returns agent details + their active listings
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var agent = await _context.Agents
-                .Include(a => a.Properties)
-                .FirstOrDefaultAsync(a => a.Id == id);
+                .Where(a => a.Id == id)
+                .Select(a => new
+                {
+                    a.Id,
+                    a.Name,
+                    a.Email,
+                    a.Phone,
+                    a.Agency,
+                    a.Bio,
+                    Properties = a.Properties.Select(p => new
+                    {
+                        p.Id,
+                        p.Title,
+                        p.Type,
+                        p.Status,
+                        p.Price,
+                        p.City,
+                        p.Locality,
+                        p.Bedrooms,
+                        p.Bathrooms,
+                        p.AreaSqFt
+                    })
+                })
+                .FirstOrDefaultAsync();
 
             if (agent is null) return NotFound();
 
-            var result = new
-            {
-                agent.Id,
-                agent.Name,
-                agent.Email,
-                agent.Phone,
-                agent.Agency,
-                agent.Bio,
-                Properties = agent.Properties.Select(p => new
-                {
-                    p.Id,
-                    p.Title,
-                    p.Type,
-                    p.Status,
-                    p.Price,
-                    p.City,
-                    p.Locality,
-                    p.Bedrooms,
-                    p.Bathrooms,
-                    p.AreaSqFt
-                })
-            };
-
-            return Ok(result);
+            return Ok(agent);
         }
 
         // POST /api/agents

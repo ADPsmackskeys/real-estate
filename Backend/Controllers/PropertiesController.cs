@@ -70,10 +70,10 @@ namespace Backend.Controllers
                 "newest"     => query.OrderByDescending(p => p.ListedAt),
                 "area"       => query.OrderBy(p => p.AreaSqFt),
                 "popular"    => query.OrderByDescending(p => p.ViewCount),
-                _            => query.OrderByDescending(p => p.ListedAt) // default: newest first
+                _            => query.OrderByDescending(p => p.ListedAt)
             };
 
-            // --- Projection ---
+            // --- Projection (breaks circular reference) ---
             var results = await query.Select(p => new
             {
                 p.Id,
@@ -104,14 +104,39 @@ namespace Backend.Controllers
         {
             var property = await _context.Properties
                 .Include(p => p.Agent)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .Where(p => p.Id == id)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Title,
+                    p.Description,
+                    p.Type,
+                    p.Status,
+                    p.Price,
+                    p.Bedrooms,
+                    p.Bathrooms,
+                    p.AreaSqFt,
+                    p.Address,
+                    p.City,
+                    p.Locality,
+                    p.Latitude,
+                    p.Longitude,
+                    p.AmenitiesJson,
+                    p.ViewCount,
+                    p.ListedAt,
+                    Agent = new { p.Agent!.Name, p.Agent.Email, p.Agent.Phone, p.Agent.Agency }
+                })
+                .FirstOrDefaultAsync();
 
-            if (property is null)
-                return NotFound();
+            if (property is null) return NotFound();
 
-            // Increment view count
-            property.ViewCount++;
-            await _context.SaveChangesAsync();
+            // Increment view count separately
+            var entity = await _context.Properties.FindAsync(id);
+            if (entity != null)
+            {
+                entity.ViewCount++;
+                await _context.SaveChangesAsync();
+            }
 
             return Ok(property);
         }

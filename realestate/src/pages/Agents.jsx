@@ -1,19 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AgentCard from "../components/AgentCard";
-import agentsData from "../data/agents.json";
-import propertiesData from "../data/properties.json";
+import { agentsApi } from "../api";
 
 export default function Agents() {
-  const [filter, setFilter] = useState("all");
+  const [agents, setAgents]   = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
 
-  const locations = [...new Set(agentsData.flatMap((a) => a.locations))];
+  useEffect(() => {
+    agentsApi.getAll()
+      .then(setAgents)
+      .catch(() => setError("Could not load agents. Is the backend running?"))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const filtered = filter === "all"
-    ? agentsData
-    : agentsData.filter((a) => a.locations.includes(filter));
-
-  const listingCount = (agentId) =>
-    propertiesData.filter((p) => p.agentId === agentId).length;
+  if (loading) {
+    return (
+      <main className="agents-page">
+        <div className="page-inner"><p>Loading agents…</p></div>
+      </main>
+    );
+  }
 
   return (
     <main className="agents-page">
@@ -23,29 +30,16 @@ export default function Agents() {
           <p className="page-subtitle">
             Connect with experienced property consultants for site visits and expert guidance.
           </p>
-        </div>
-
-        <div className="agent-filter-row">
-          <button
-            className={`pill ${filter === "all" ? "active" : ""}`}
-            onClick={() => setFilter("all")}
-          >
-            All Cities
-          </button>
-          {locations.map((l) => (
-            <button
-              key={l}
-              className={`pill ${filter === l ? "active" : ""}`}
-              onClick={() => setFilter(l)}
-            >
-              {l}
-            </button>
-          ))}
+          {error && <p className="error-msg">{error}</p>}
         </div>
 
         <div className="agents-grid">
-          {filtered.map((agent) => (
-            <AgentCard key={agent.id} agent={agent} listingCount={listingCount(agent.id)} />
+          {agents.map((agent) => (
+            <AgentCard
+              key={agent.id}
+              agent={agent}
+              listingCount={agent.listingCount}
+            />
           ))}
         </div>
       </div>
