@@ -1,19 +1,20 @@
-import { useState } from "react";
-import { Heart, Users, Home, Menu, X } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Heart, Users, Home } from "lucide-react";
 
-export default function TopBar({ currentPage, onNavigate, favouriteCount }) {
-  const [menuOpen, setMenuOpen] = useState(false);
+export default function TopBar({ favouriteCount }) {
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navItems = [
-    { id: "home", label: "Properties", icon: Home },
-    { id: "agents", label: "Agents", icon: Users },
-    { id: "favourites", label: "Saved", icon: Heart, badge: favouriteCount },
+    { id: "/", label: "Properties", icon: Home },
+    { id: "/agents", label: "Agents", icon: Users },
+    { id: "/favourites", label: "Saved", icon: Heart, badge: favouriteCount },
   ];
 
   return (
     <header className="topbar">
       <div className="topbar-inner">
-        <div className="topbar-logo" onClick={() => onNavigate("home")}>
+        <div className="topbar-logo" onClick={() => navigate("/")}>
           <div className="logo-mark">
             <span className="logo-square" />
             <span className="logo-square logo-square--offset" />
@@ -23,12 +24,12 @@ export default function TopBar({ currentPage, onNavigate, favouriteCount }) {
           </span>
         </div>
 
-        <nav className="topbar-nav desktop-only">
+        <nav className="topbar-nav">
           {navItems.map(({ id, label, icon: Icon, badge }) => (
             <button
               key={id}
-              className={`nav-item ${currentPage === id ? "nav-item--active" : ""}`}
-              onClick={() => onNavigate(id)}
+              className={`nav-item ${location.pathname === id ? "nav-item--active" : ""}`}
+              onClick={() => navigate(id)}
             >
               <Icon size={16} />
               <span>{label}</span>
@@ -37,26 +38,8 @@ export default function TopBar({ currentPage, onNavigate, favouriteCount }) {
           ))}
         </nav>
 
-        <button className="mobile-menu-toggle mobile-only" onClick={() => setMenuOpen(!menuOpen)}>
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div />
       </div>
-
-      {menuOpen && (
-        <div className="mobile-nav">
-          {navItems.map(({ id, label, icon: Icon, badge }) => (
-            <button
-              key={id}
-              className={`mobile-nav-item ${currentPage === id ? "mobile-nav-item--active" : ""}`}
-              onClick={() => { onNavigate(id); setMenuOpen(false); }}
-            >
-              <Icon size={18} />
-              <span>{label}</span>
-              {badge > 0 && <span className="nav-badge">{badge}</span>}
-            </button>
-          ))}
-        </div>
-      )}
     </header>
   );
 }

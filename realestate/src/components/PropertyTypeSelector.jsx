@@ -1,7 +1,7 @@
 const TYPES = [
-  { value: "all",         label: "All Types",    icon: "🏙️" },
-  { value: "residential", label: "Residential",  icon: "🏡" },
-  { value: "commercial",  label: "Commercial",   icon: "🏢" },
+  { value: "all", label: "All Types" },
+  { value: "residential", label: "Residential" },
+  { value: "commercial", label: "Commercial" },
 ];
 
 export default function PropertyTypeSelector({ value, onChange, disabled = false }) {

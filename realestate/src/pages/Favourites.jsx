@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PropertyCard from "../components/PropertyCard";
 import propertiesData from "../data/properties.json";
 import agentsData from "../data/agents.json";
 
 export default function Favourites({ favourites, onToggleFav, isFav }) {
+  const navigate = useNavigate();
   const agentMap = Object.fromEntries(agentsData.map((a) => [a.id, a]));
   const saved = propertiesData.filter((p) => favourites.includes(p.id));
 
@@ -32,8 +33,9 @@ export default function Favourites({ favourites, onToggleFav, isFav }) {
               <PropertyCard
                 key={p.id}
                 property={p}
-                isFav={isFav(p.id)}
-                onToggleFav={onToggleFav}
+                isFavourite={isFav(p.id)}
+                onToggleFavourite={onToggleFav}
+                onViewDetails={(prop) => navigate(`/property/${prop.id}`)}
                 agent={agentMap[p.agentId]}
               />
             ))}

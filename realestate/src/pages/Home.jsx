@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import LocationSelector from "../components/LocationSelector";
 import PropertyTypeSelector from "../components/PropertyTypeSelector";
 import Filters from "../components/Filters";
@@ -15,6 +16,7 @@ const DEFAULT_FILTERS = {
 };
 
 export default function Home({ favourites, onToggleFav, isFav }) {
+  const navigate = useNavigate();
   const [location, setLocation] = useState("all");
   const [type, setType] = useState("all");
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
@@ -114,8 +116,9 @@ export default function Home({ favourites, onToggleFav, isFav }) {
               <PropertyCard
                 key={p.id}
                 property={p}
-                isFav={isFav(p.id)}
-                onToggleFav={onToggleFav}
+                isFavourite={isFav(p.id)}
+                onToggleFavourite={onToggleFav}
+                onViewDetails={(prop) => navigate(`/property/${prop.id}`)}
                 agent={agentMap[p.agentId]}
               />
             ))}

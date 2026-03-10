@@ -14,11 +14,21 @@
     "parking": 2,
     "furnished": "fully",
     "status": "for-sale",
-    "tags": ["penthouse", "sea view", "luxury"],
+    "tags": [
+      "penthouse",
+      "sea view",
+      "luxury"
+    ],
     "agentId": "a1",
     "images": [],
     "description": "A stunning penthouse with panoramic sea views and premium finishes throughout.",
-    "amenities": ["gym", "pool", "concierge", "terrace"]
+    "amenities": [
+      "gym",
+      "pool",
+      "concierge",
+      "terrace"
+    ],
+    "image": "/images/apartment-8.jpg"
   },
   {
     "id": "p2",
@@ -35,11 +45,18 @@
     "parking": 1,
     "furnished": "semi",
     "status": "for-sale",
-    "tags": ["studio", "city center"],
+    "tags": [
+      "studio",
+      "city center"
+    ],
     "agentId": "a2",
     "images": [],
     "description": "Compact and efficient studio in the heart of Koramangala.",
-    "amenities": ["gym", "security"]
+    "amenities": [
+      "gym",
+      "security"
+    ],
+    "image": "/images/apartment-7.jpg"
   },
   {
     "id": "p3",
@@ -56,11 +73,20 @@
     "parking": 4,
     "furnished": "unfurnished",
     "status": "for-sale",
-    "tags": ["villa", "heritage", "garden"],
+    "tags": [
+      "villa",
+      "heritage",
+      "garden"
+    ],
     "agentId": "a1",
     "images": [],
     "description": "A grand heritage villa set in lush grounds in the diplomatic enclave.",
-    "amenities": ["garden", "pool", "staff quarters"]
+    "amenities": [
+      "garden",
+      "pool",
+      "staff quarters"
+    ],
+    "image": "/images/villa-3.jpg"
   },
   {
     "id": "p4",
@@ -77,11 +103,21 @@
     "parking": 10,
     "furnished": "bare-shell",
     "status": "for-sale",
-    "tags": ["office", "grade-a", "bkc"],
+    "tags": [
+      "office",
+      "grade-a",
+      "bkc"
+    ],
     "agentId": "a3",
     "images": [],
     "description": "Premium Grade-A office space in Mumbai's premier business district.",
-    "amenities": ["lobby", "parking", "cafeteria", "conference rooms"]
+    "amenities": [
+      "lobby",
+      "parking",
+      "cafeteria",
+      "conference rooms"
+    ],
+    "image": "/images/villa-9.jpg"
   },
   {
     "id": "p5",
@@ -98,11 +134,19 @@
     "parking": 5,
     "furnished": "shell",
     "status": "for-lease",
-    "tags": ["retail", "high street", "showroom"],
+    "tags": [
+      "retail",
+      "high street",
+      "showroom"
+    ],
     "agentId": "a2",
     "images": [],
     "description": "Prime retail showroom on MG Road with excellent footfall.",
-    "amenities": ["storage", "loading bay"]
+    "amenities": [
+      "storage",
+      "loading bay"
+    ],
+    "image": "/images/apartment-6.jpg"
   },
   {
     "id": "p6",
@@ -119,10 +163,19 @@
     "parking": 1,
     "furnished": "semi",
     "status": "for-sale",
-    "tags": ["family", "3bhk", "society"],
+    "tags": [
+      "family",
+      "3bhk",
+      "society"
+    ],
     "agentId": "a3",
     "images": [],
     "description": "Spacious 3BHK in a well-maintained residential society with green surroundings.",
-    "amenities": ["playground", "gym", "clubhouse"]
+    "amenities": [
+      "playground",
+      "gym",
+      "clubhouse"
+    ],
+    "image": "/images/apartment-3.jpg"
   }
 ]
